@@ -1,0 +1,21 @@
+Full Name,Voter ID,Voter Card Number,Email,Age,Gender,Aadhaar Number,State,District,Assembly Constituency,Booth ID,Voter Status
+Amit Sharma,VOT3978,AZ9330415,ajmeerkng@gmail.com,58,Male,612943512079,Uttar Pradesh,Lucknow,AC-101,VYP561,Active
+Priya Verma,VOT7727,VC5004249,priya.verma@gmail.com,38,Female,993949514732,Maharashtra,Mumbai,AC-102,RUK245,Active
+Ravi Kumar,VOT6628,XZ4877887,ravi.kumar@gmail.com,66,Male,7484-4806-6438,Bihar,Patna,AC-103,UMF990,Active
+Sunita Joshi,VOT6673,YN5721409,sunita.joshi@gmail.com,41,Female,4897-9560-7234,West Bengal,Kolkata,AC-104,NXL965,Active
+Anil Mehta,VOT1733,BO5608797,anil.mehta@gmail.com,28,Male,4726-2489-1270,Tamil Nadu,Chennai,AC-105,SRQ948,Active
+Kavita Desai,VOT3263,GV1455406,kavita.desai@gmail.com,78,Female,4674 6623 1557,Uttar Pradesh,Lucknow,AC-101,EMQ395,Active
+Manoj Patel,VOT9588,MJ5519799,manoj.patel@gmail.com,55,Male,3609-8545-1542,Maharashtra,Mumbai,AC-102,PVB105,Active
+Neha Reddy,VOT9652,MV2576218,neha.reddy@gmail.com,49,Female,664748432812,Bihar,Patna,AC-103,KHA023,Active
+Suresh Yadav,VOT4714,CQ1187711,suresh.yadav@gmail.com,69,Male,307335660426,West Bengal,Kolkata,AC-104,BFI570,Active
+Pooja Singh,VOT4087,QM1377709,pooja.singh@gmail.com,65,Female,5702-4002-6924,Tamil Nadu,Chennai,AC-105,NOB119,Active
+Rahul Nair,VOT1450,IJ2974203,rahul.nair@gmail.com,60,Male,721830520761,Uttar Pradesh,Lucknow,AC-101,LXV614,Active
+Sneha Roy,VOT4872,JA8626152,sneha.roy@gmail.com,19,Female,4723-3582-7539,Maharashtra,Mumbai,AC-102,PNB854,Active
+Vikram Malhotra,VOT4933,AM2417436,vikram.malhotra@gmail.com,36,Male,924665882373,Bihar,Patna,AC-103,HOZ316,Active
+Meena Iyer,VOT7299,BC4064323,meena.iyer@gmail.com,66,Female,6446-0482-0685,West Bengal,Kolkata,AC-104,VCM224,Active
+Arun Saxena,VOT4465,DV5190780,arun.saxena@gmail.com,57,Male,873231987778,Tamil Nadu,Chennai,AC-105,LPV726,Active
+Divya Kapoor,VOT3931,OZ9909742,divya.kapoor@gmail.com,21,Female,820350439972,Uttar Pradesh,Lucknow,AC-101,XSU309,Inactive
+Gopal Bansal,VOT9764,WI0569707,gopal.bansal@gmail.com,23,Male,334761055374,Maharashtra,Mumbai,AC-102,DFH985,Inactive
+Swati Agarwal,VOT6148,HO1470394,swati.agarwal@gmail.com,47,Female,7948-5984-5832,Bihar,Patna,AC-103,EAP837,Inactive
+Harish Choudhary,VOT4359,YK5710601,harish.choudhary@gmail.com,52,Male,7972-0223-4436,West Bengal,Kolkata,AC-104,DFF989,Inactive
+Jyoti Thakur,VOT7780,RT6332821,jyoti.thakur@gmail.com,26,Female,210114041587,Tamil Nadu,Chennai,AC-105,QFP604,Inactive

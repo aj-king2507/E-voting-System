@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Voting</title>
+    <style>
+        body {
+            background-image: url('https://wallpapers.com/images/high/dark-texture-background-2n9isckm4hox8zg2.webp'); /* Replace with actual image path */
+            background-size: cover;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        h1, h2 {
+            color: red;
+        }
+        form {
+            background-color: rgba(255, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        label, input, select, button {
+            margin: 10px 0;
+            display: block;
+            width: 100%;
+        }
+        button {
+            background-color: white;
+            color: red;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tweetnacl/1.0.1/nacl.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tweetnacl-util@0.15.1/nacl-util.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    
+
+
+
+</head>
+<body>
+    <h1>Welcome to the E-Voting System</h1>
+    <h2>Select a Candidate to Vote</h2>
+
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="alert alert-dismissible fade show" role="alert">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+    <form id="voteForm">
+
+        <label for="full_name">Full Name:</label>
+        <input type="text" id="full_name" name="full_name" required>
+
+        <label for="voter_id">Voter ID:</label>
+        <input type="text" id="voter_id" name="voter_id" pattern="VOT\d{4}" required>
+        
+        <label for="voter_card_number">Voter Card Number:</label>
+        <input type="text" id="voter_card_number" name="voter_card_number" pattern="[A-Z]{2}\d{7}" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="candidate">Candidate:</label>
+        <select id="candidate" name="candidate" required>
+            {% for candidate in candidates %}
+                <option value="{{ candidate }}">{{ candidate }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit">Vote</button>
+
+        <!-- Button to access the voting list -->
+        <div class="voting-list-button">
+            <a href="/voting_list" class="btn btn-secondary">Access Voting List</a>
+        </div>
+        </form>
+        <script>
+            setTimeout(() => {
+                const flashMessages = document.getElementById('flash-messages');
+                if (flashMessages) {
+                    flashMessages.style.display = 'none';
+                }
+            }, 5000); // Hides after 5 seconds
+        </script>
+
+    <script>
+        emailjs.init("KETXkj4v7fICTN4e_"); // Replace with your actual EmailJS user ID
+    </script>
+
+    <script>
+            
+
+        function getKeyPair() {
+                let storedKeyPair = localStorage.getItem('keyPair');
+
+                if (!storedKeyPair) {
+                    const keyPair = nacl.sign.keyPair();
+                    storedKeyPair = {
+                        publicKey: nacl.util.encodeBase64(new Uint8Array(keyPair.publicKey)),
+                        secretKey: nacl.util.encodeBase64(new Uint8Array(keyPair.secretKey))
+                    };
+                    localStorage.setItem('keyPair', JSON.stringify(storedKeyPair));
+                    console.log("🔹 New Key Pair Generated");
+                } else {
+                    console.log("🔹 Using Existing Key Pair");
+                }
+
+                storedKeyPair = JSON.parse(localStorage.getItem('keyPair'));
+
+                return {
+                    publicKey: storedKeyPair.publicKey,
+                    secretKey: nacl.util.decodeBase64(storedKeyPair.secretKey)
+                };
+            }
+
+
+        async function sha256(data) {
+            const hashBuffer = await crypto.subtle.digest("SHA-256", data);  // ✅ Correct usage
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+
+
+
+    document.getElementById('voteForm').onsubmit = async function(event) {
+        event.preventDefault();
+
+            // Retrieve values before processing
+        const full_name = document.getElementById('full_name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const candidate = document.getElementById('candidate').value.trim();
+
+        // Ensure email is not empty before proceeding
+        if (!email) {
+            alert("Please enter a valid email address.");
+            return;
+        }
+        const { publicKey, secretKey } = getKeyPair();
+
+        console.log("🔹 Raw Public Key (Client-side):", publicKey);
+
+        // ✅ Fix: Convert base64 public key to raw bytes before hashing
+        const decodedPublicKey = nacl.util.decodeBase64(publicKey);
+        
+        // ✅ Ensure we `await` the hash function properly
+        const voterHash = await sha256(decodedPublicKey.buffer);  
+        console.log("🔹 Anonymous Voter Hash (Client-side):", voterHash);
+
+        // ✅ Ensure voter_hash is a string before signing
+        const voteData = { voter_hash: voterHash.toString(), candidate: document.getElementById('candidate').value };
+        const message = JSON.stringify(voteData, separators=(',', ':'));
+
+        console.log("🔹 Signing Message (Client-side):", message);
+        
+        const messageUint8 = nacl.util.decodeUTF8(message);
+        const signature = nacl.sign.detached(messageUint8, secretKey);
+
+        const payload = {
+            public_key: publicKey,
+            signature: nacl.util.encodeBase64(signature),
+            candidate: voteData.candidate
+        };
+
+        console.log("🔹 Sending Payload:", payload);
+
+        try {
+            const response = await fetch('/vote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message || "Vote successfully submitted!");
+                window.location.href = result.redirect;
+                // Send confirmation email
+                sendConfirmationEmail(email, full_name, candidate);
+            } else {
+                alert(result.error || "Vote submission failed.");
+            }
+        } catch (err) {
+            console.error("Error during vote submission:", err);
+            alert("An error occurred. Please try again.");
+        }
+    };
+
+    function sendConfirmationEmail(email, full_name, candidate ) {
+        
+        console.log("🔍 Sending confirmation email to:", email);
+        console.log("🔍 Full Name:", full_name);
+        console.log("🔍 Candidate:", candidate);
+        
+        if (!email) {
+        console.error("❌ No email provided for confirmation.");
+        return;
+    }
+        emailjs.send("service_bbsmu68", "template_mceircb", {
+            to_email: email,
+            full_name: full_name,
+            candidate: candidate
+            
+        }).then(response => {
+            console.log("✅ Confirmation email sent!", response);
+        }).catch(error => {
+            console.error("❌ Failed to send confirmation email", error);
+        });
+    }
+        </script>
+
+</body>
+</html>

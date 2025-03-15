@@ -1,0 +1,2 @@
+Service ID = service_bbsmu68
+Template ID:template_mceircb

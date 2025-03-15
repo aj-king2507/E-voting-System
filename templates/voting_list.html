@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://wallpapers.com/images/high/dark-texture-background-2n9isckm4hox8zg2.webp');
+            background-size: cover;
+            color: #721c24;
+            margin: 0;
+            padding: 20px;
+            max-width: 1350px;
+        }
+        h1 {
+            text-align: center;
+            color: #c82333;
+        }
+        table {
+            width: 100%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        th {
+            background-color: #c82333;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5c6cb;
+        }
+        .logout-button {
+            display: block;
+            text-align: center;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #c82333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: 100px;
+        }
+        .logout-button:hover {
+            background-color: #bd2130;
+        }
+    </style>
+</head>
+<body>
+    <h1>Voting List</h1>
+    
+    <a href="/" class="logout-button">Logout</a>
+
+    <!-- Vote Count Table -->
+    <h2>Vote Counts</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Vote Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for candidate, count in candidate_counts.items() %}
+                <tr>
+                    <td>{{ candidate }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Detailed Votes Table -->
+    <h2>Verified Votes</h2>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Public Key</th>
+                    <th>Signature</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vote in votes.values() %}
+                    <tr>
+                        <td>{{ vote.candidate }}</td>
+                        <td>{{ vote.public_key }}</td>
+                        <td>{{ vote.signature }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

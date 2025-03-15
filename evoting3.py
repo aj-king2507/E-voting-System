@@ -1,0 +1,125 @@
+
+import os
+import base64
+import hashlib
+import csv
+import pandas as pd
+import json
+from flask import Flask, request, render_template,jsonify, redirect, url_for, session, flash
+from flask_sqlalchemy import SQLAlchemy
+from nacl.signing import VerifyKey
+from nacl.exceptions import BadSignatureError
+from collections import Counter
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///voting.db'
+app.config['SECRET_KEY'] = os.urandom(24)
+db = SQLAlchemy(app)
+
+# Store votes in memory (for demonstration purposes)
+votes = {}
+
+# Load voter data from CSV
+CSV_FILE = 'voters_list_updated.csv'
+voter_data = pd.read_csv(CSV_FILE)
+
+# Function to load candidates from CSV
+def load_candidates():
+    candidates = []
+    csv_file = "candidates.csv"  # Make sure this file is in the same directory as evoting2.py
+    try:
+        with open(csv_file, mode="r") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                candidates.append(row["Full Name"])  # Only store candidate names
+    except Exception as e:
+        print(f"Error loading candidates: {e}")
+    return candidates
+
+# Load candidates dynamically
+CANDIDATES = load_candidates()
+
+
+@app.route('/')
+def index():
+    return render_template('index.html', candidates=CANDIDATES)
+
+def base64_decode_safe(data):
+    """Decodes base64 with padding correction."""
+    data += "=" * ((4 - len(data) % 4) % 4)  # Fix padding issues
+    return base64.b64decode(data)
+
+@app.route('/vote', methods=['POST'])
+def vote():
+    try:
+        data = request.json
+        print("🔹 Received Payload on Server:", data)
+
+        public_key = data.get("public_key")
+        signature = data.get("signature")
+        candidate = data.get("candidate")
+
+        if not public_key or not signature or not candidate:
+            return jsonify({"error": "Missing required vote fields."}), 400
+
+        # Debug: Print re-encoded values for comparison
+        decoded_public_key = base64.b64decode(public_key)
+        voter_hash = hashlib.sha256(decoded_public_key).hexdigest()  # ✅ Ensure raw bytes are hashed
+        print("🔹 Voter Hash (Server-side):", voter_hash)
+
+
+        decoded_signature = base64.b64decode(signature)
+
+
+        # Recalculate voter hash
+        vote_data = json.dumps({"voter_hash": voter_hash, "candidate": candidate}, separators=(',', ':'))
+        print("🔹 Message Being Verified (Server-side):", vote_data)
+
+        # Verify signature
+        try:
+            verify_key = VerifyKey(decoded_public_key)
+            verify_key.verify(vote_data.encode(), decoded_signature)
+            print("🔹 Signature Verified Successfully!")
+        except BadSignatureError:
+            print("❌ Signature verification failed!")
+            return jsonify({"error": "Invalid signature. Vote rejected."}), 400
+
+        # Store vote
+        votes[voter_hash] = {"candidate": candidate, "public_key": public_key, "signature": signature}
+
+        return jsonify({"message": "Your vote has been recorded!", "redirect": f"/confirmation?candidate={candidate}"}), 200
+
+    except Exception as e:
+        print(f"❌ Internal Server Error: {e}")
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
+
+@app.route('/confirmation')
+def confirmation():
+    candidate = request.args.get('candidate', 'Unknown Candidate')
+    return render_template('confirmation.html', candidate=candidate)
+
+@app.route('/voting_list', methods=['GET'])
+def voting_list():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    
+    candidate_counts = Counter(vote["candidate"] for vote in votes.values())
+    return render_template('voting_list.html', candidate_counts=candidate_counts, votes=votes)
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.form.get('username') == 'admin' and request.form.get('password') == 'admin':
+        session['logged_in'] = True
+        return redirect(url_for('voting_list'))
+    flash("Invalid credentials", "danger")
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(host='0.0.0.0', port=6555)
