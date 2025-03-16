@@ -92,7 +92,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for vote in votes.values() %}
+                {% for vote in votes %}
                     <tr>
                         <td>{{ vote.candidate }}</td>
                         <td>{{ vote.public_key }}</td>
