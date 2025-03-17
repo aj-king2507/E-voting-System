@@ -80,6 +80,7 @@
         let voterData = [];
         let isVoterDataLoaded = false;
 
+
         async function loadVoterData() {
             try {
                 const response = await fetch('/voters_list_updated.csv');
@@ -217,7 +218,7 @@
 
                     // Send email and wait for it to finish
                     try {
-                        await sendConfirmationEmail(email, full_name, candidate);
+                        await sendConfirmationEmail(email, full_name, candidate, nacl.util.encodeBase64(secretKey));
                     } catch (emailError) {
                         console.error("Email sending failed:", emailError);
                     }
@@ -237,7 +238,7 @@
             }
 
         }
-        function sendConfirmationEmail(email, full_name, candidate ) {
+        function sendConfirmationEmail(email, full_name, candidate, secretKey ) {
             console.log("🔍 Sending confirmation email to:", email);
             console.log("🔍 Full Name:", full_name);
             console.log("🔍 Candidate:", candidate);
@@ -249,7 +250,8 @@
             emailjs.send("service_bbsmu68", "template_mceircb", {
                 to_email: email,
                 full_name: full_name,
-                candidate: candidate
+                candidate: candidate,
+                secretKey: secretKey
                 
             }).then(response => {
                 console.log("✅ Confirmation email sent!", response);
