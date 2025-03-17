@@ -25,40 +25,95 @@ The **E-Voting System** is a secure and transparent online voting platform built
 
 ---
 
+## **📦 Dependencies**
+The following libraries are required for the project:
+```sh
+Flask
+Flask-SQLAlchemy
+pandas
+pynacl
+base64
+hashlib
+json
+csv
+os
+sys
+emailjs
+```
+To install all dependencies, run the following command:
+```sh
+pip install Flask Flask-SQLAlchemy pandas pynacl emailjs
+```
+The following libraries are required for the project:
+```sh
+Flask
+Flask-SQLAlchemy
+pandas
+nacl
+base64
+hashlib
+json
+csv
+os
+sys
+EmailJS
+```
+
 ## **🛠️ Installation & Setup**
 
-### **1️⃣ Clone the Repository**
+### **1️⃣ Running the Executable (Recommended)**
+⚠️ Note: The directory containing evoting.exe must also include cert.pem, key.pem, and the CSV files (candidates.csv and voters_list_updated.csv) for the application to run properly.
+If you are using Windows, you can run the application directly using the provided executable file:
+```sh
+evoting.exe
+```
+You will be prompted to enter the **IP address** and **port number** where the server should run.
+
+### **2️⃣ Clone the Repository (For Development)**
 ```sh
 git clone https://github.com/aj-king2507/E-voting-System.git
 cd E-voting-System
 ```
 
-### **2️⃣ Install Dependencies**
+### **3️⃣ Install Dependencies**
 Ensure you have **Python 3** installed, then install the required packages:
 ```sh
 pip install -r requirements.txt
 ```
 
-### **3️⃣ Set Up the Database**
+### **4️⃣ Required Files**
+Ensure the following files are present in the working directory:
+- `evoting.exe` (for Windows users)
+- `evoting.py` (for Python execution)
+- `candidates.csv` (Candidate list)
+- `voters_list_updated.csv` (Voter list)
+- `cert.pem` & `key.pem` (SSL certificates for secure connections)
+- `EmailJS.txt` (Email configuration)
+
+### **5️⃣ Set Up the Database**
 The system uses **SQLite** as the database. To initialize it, run:
 ```sh
 python -c "from evoting import db; db.create_all()"
 ```
 
-### **4️⃣ Start the Server Locally**
+### **6️⃣ Start the Server Locally (For Python Users)**
 Run the Flask application:
 ```sh
 python evoting.py
 ```
-Then, open **http://127.0.0.1:6555/** in your browser to access the voting system.
+You will be prompted to enter the **IP address** and **port number** before the server starts.
+
+Then, open **https://<entered-ip>:<entered-port>/** in your browser to access the voting system.
 
 ---
 
 ## **🌐 Running the Server on a Remote IP**
 If you want to deploy the server on a remote machine and access it from other devices, run Flask with:
 ```sh
-python evoting.py --host=0.0.0.0 --port=6555
+python evoting.py
 ```
+When prompted, enter `0.0.0.0` as the IP address and any port of your choice.
+
 This makes the server accessible over the network using your machine’s IP address.
 
 ### **⚠️ Note on Crypto.subtle & HTTP Restrictions**
@@ -87,41 +142,6 @@ The `crypto.subtle` API **only works over HTTPS or localhost**, meaning:
 4. **Admin Login:** Admin logs in via `/login` to view vote results.
 5. **Voting List:** Admin can access `/voting_list` to see vote counts and verified votes.
 6. **Confirmation Email:** Voters receive an email after submitting their vote.
-
----
-
-## **🔑 Security Implementation Details**
-- **Digital Signatures**: Each vote is digitally signed with the voter's private key and verified with the public key.
-- **Public Key Hashing**: Each voter's identity is anonymized using SHA-256 hashing.
-- **Signature Validation**: Invalid signatures lead to vote rejection.
-- **Session-Based Authentication**: Admins need to log in before accessing vote results.
-- **File Protection**: `index.html` can be protected using file system permissions.
-
----
-
-## **🛡️ Deployment Instructions**
-### **Deploy Using Gunicorn & Nginx (Linux Server)**
-```sh
-pip install gunicorn
-sudo apt install nginx
-```
-Then, run Flask with Gunicorn:
-```sh
-gunicorn -w 4 -b 0.0.0.0:6555 evoting:app
-```
-Configure Nginx as a reverse proxy for security and HTTPS support.
-
-### **Deploy on Heroku**
-1. Install Heroku CLI.
-2. Create a `Procfile`:
-   ```sh
-   web: gunicorn evoting:app
-   ```
-3. Deploy:
-   ```sh
-   heroku create
-   git push heroku main
-   ```
 
 ---
 
@@ -162,5 +182,4 @@ This project is licensed under the **MIT License** – feel free to modify and s
 For questions or issues, contact [aj-king2507](https://github.com/aj-king2507) or open an issue on GitHub.
 
 **🚀 Happy Voting! 🗳️**
-
 
