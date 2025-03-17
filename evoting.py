@@ -133,4 +133,6 @@ def logout():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(host='10.17.4.21', port=443, ssl_context=('cert.pem', 'key.pem'))
+    host = input("Enter the IP address of the server: ")
+    port = input("Enter the port number: ")
+    app.run(host=host, port=port, ssl_context=('cert.pem', 'key.pem'))
