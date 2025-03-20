@@ -5,7 +5,7 @@ a = Analysis(
     ['evoting.py'],
     pathex=[],
     binaries=[],
-    datas=[('voters_list_updated.csv', '.'), ('templates', 'templates'), ('static', 'static')],
+    datas=[('templates', 'templates'), ('static', 'static')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

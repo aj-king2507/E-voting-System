@@ -5,6 +5,7 @@ import hashlib
 import csv
 import pandas as pd
 import json
+import sys
 from flask import Flask, request, render_template,jsonify, redirect, url_for, session, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from nacl.signing import VerifyKey
@@ -21,9 +22,23 @@ votes = []  # ✅ Store votes in a list
 used_voter_hashes = set()  # ✅ Keep track of used voter hashes
 
 
-# Load voter data from CSV
-CSV_FILE = 'voters_list_updated.csv'
+# Get the directory where the EXE or script is running
+if getattr(sys, 'frozen', False):  # Check if running as a PyInstaller EXE
+    base_dir = os.path.dirname(sys.executable)
+else:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Define the path to the CSV file
+CSV_FILE = os.path.join(base_dir, "voters_list_updated.csv")
+
+# Check if the file exists
+if not os.path.exists(CSV_FILE):
+    raise FileNotFoundError(f"CSV file not found: {CSV_FILE}")
+
+# Load voter data
 voter_data = pd.read_csv(CSV_FILE)
+
+print("CSV loaded successfully!")
 
 # Function to load candidates from CSV
 def load_candidates():
@@ -49,7 +64,7 @@ def index():
 # Serve the CSV file properly
 @app.route('/voters_list_updated.csv')
 def get_csv():
-    return send_from_directory('.', 'voters_list_updated.csv')  # Serve from root
+    return send_from_directory(base_dir, 'voters_list_updated.csv')  # Serve from base_dir
 
 def base64_decode_safe(data):
     """Decodes base64 with padding correction."""
